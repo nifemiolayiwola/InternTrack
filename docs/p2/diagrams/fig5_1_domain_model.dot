@@ -1,0 +1,68 @@
+// Figure 5.1 InternTrack domain model (conceptual classes, attributes, associations with multiplicities)
+// Render: dot -Tpng -Gdpi=220 fig5_1_domain_model.dot -o fig5_1_domain_model.png
+graph DomainModel {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=12, nodesep=0.45, ranksep=1.3, pad=0.3, splines=true];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [fontname="Helvetica", fontsize=10, labelfontsize=11, labeldistance=1.8, labelangle=25, color="#333333"];
+
+  StudentAccount [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#f3f6fb">
+      <tr><td bgcolor="#dbe5f3"><b>StudentAccount</b></td></tr>
+      <tr><td align="left" balign="left">email address<br/>password</td></tr>
+    </table>>];
+
+  ProgressSummary [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#f3f6fb">
+      <tr><td bgcolor="#dbe5f3"><b>ProgressSummary</b></td></tr>
+      <tr><td align="left" balign="left">/total applications<br/>/applied count<br/>/interviewing count<br/>/offered count<br/>/rejected count</td></tr>
+    </table>>];
+
+  InternshipApplication [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#f3f6fb">
+      <tr><td bgcolor="#dbe5f3"><b>InternshipApplication</b></td></tr>
+      <tr><td align="left" balign="left">company name<br/>position title<br/>date applied<br/>deadline<br/>current status</td></tr>
+    </table>>];
+
+  Interview [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#f3f6fb">
+      <tr><td bgcolor="#dbe5f3"><b>Interview</b></td></tr>
+      <tr><td align="left" balign="left">interview date</td></tr>
+    </table>>];
+
+  StatusChange [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#f3f6fb">
+      <tr><td bgcolor="#dbe5f3"><b>StatusChange</b></td></tr>
+      <tr><td align="left" balign="left">previous status<br/>new status<br/>change date</td></tr>
+    </table>>];
+
+  Document [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#f3f6fb">
+      <tr><td bgcolor="#dbe5f3"><b>Document</b></td></tr>
+      <tr><td align="left" balign="left">document type<br/>file name<br/>file format<br/>file size<br/>upload date</td></tr>
+    </table>>];
+
+  Reminder [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#f3f6fb">
+      <tr><td bgcolor="#dbe5f3"><b>Reminder</b></td></tr>
+      <tr><td align="left" balign="left">reminder type<br/>due date<br/>/days remaining</td></tr>
+    </table>>];
+
+  StatusNote [shape=note, style=filled, fillcolor="#fff8dc", fontsize=10, margin="0.12,0.06",
+    label="current status and the two statuses in a\nStatusChange are each one of Applied,\nInterviewing, Offered, Rejected.\nA new application starts as Applied (FR-06)."];
+  DocNote [shape=note, style=filled, fillcolor="#fff8dc", fontsize=10, margin="0.12,0.06",
+    label="document type is Resume or Cover letter;\nat most one of each per application.\nPDF only, at most 10 MB (FR-12)."];
+
+  { rank=same; StudentAccount; ProgressSummary; }
+  { rank=same; InternshipApplication; StatusNote; }
+  { rank=same; DocNote; Document; Interview; StatusChange; Reminder; }
+
+  StudentAccount -- InternshipApplication [label="keeps", taillabel="1", headlabel="0..*"];
+  StudentAccount -- ProgressSummary [label="is summarized by", taillabel="1", headlabel="1"];
+  InternshipApplication -- Interview [label="has scheduled", taillabel="1", headlabel="0..*"];
+  InternshipApplication -- StatusChange [label="has history of\n{ordered by change date}", taillabel="1", headlabel="0..*"];
+  InternshipApplication -- Document [label="has attached", taillabel="1", headlabel="0..2"];
+  InternshipApplication -- Reminder [label="is reminded by", taillabel="1", headlabel="0..*"];
+
+  InternshipApplication -- StatusNote [style=dashed, color="#999999"];
+  DocNote -- Document [style=dashed, color="#999999"];
+}

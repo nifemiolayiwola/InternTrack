@@ -1,0 +1,32 @@
+%% Figure 5.2.1 Analysis sequence diagram for UC-01 Manage Internship Application Record
+%% Follows UC-01 in section 4.2: add flow (0) to (6) and alternate flow A2 (delete).
+%% Message numbers and wording match the rows of the scenario table in section 5.2.1(b).
+%% Render: mmdc -i fig5_2_1_uc01_sequence.mmd -o fig5_2_1_uc01_sequence.png -s 3 -b white
+%%{init: {"theme": "neutral", "sequence": {"mirrorActors": false, "wrap": true, "width": 175, "messageFontSize": 14, "noteFontSize": 13, "actorFontSize": 14, "boxMargin": 8}}}%%
+sequenceDiagram
+  actor S as Student
+  participant AM as :ApplicationManager
+  participant SA as :StudentAccount
+  participant IA as :InternshipApplication
+  participant IV as :Interview
+  participant D as :Document
+
+  AM->>SA: 0.1 asks for the logged-in student's application records
+  AM->>S: 0.2 shows the student's own records and the option to add one
+  alt the student adds an application (main flow)
+    Note over S,AM: Steps (1) and (2) are trivial: the student picks Add Application and sees an empty entry
+    S->>AM: 3 submits the entered details and files
+    AM->>AM: 4.1 checks each file is a PDF of at most 10 MB
+    AM->>AM: 4.2 checks company name, position title and date applied are filled in
+    AM->>IA: 5.1 creates the application record with status Applied
+    IA->>IV: 5.2 creates an interview entry for each entered interview date
+    IA->>D: 5.3 attaches each file as a resume or cover letter
+    AM->>SA: 5.4 adds the new application to the student's records
+    AM->>S: 5.5 shows the updated list with the new record marked Applied
+  else the student deletes an application (A2)
+    S->>AM: A2.1 chooses to delete one of the listed applications
+    AM->>S: A2.2 asks the student to confirm the deletion
+    S->>AM: A2.3 confirms the deletion (if the student cancels, nothing is removed)
+    AM->>SA: A2.4 asks it to remove the application from the student's records
+    AM->>S: A2.5 shows the updated list without the deleted record
+  end

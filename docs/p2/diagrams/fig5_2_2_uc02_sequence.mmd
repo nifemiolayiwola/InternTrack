@@ -1,0 +1,36 @@
+%% Figure 5.2.2 Analysis sequence diagram for UC-02 Update Application Status and Track History
+%% Follows UC-02 in section 4.2: turns (0) to (7), A1 (same status, at step 4) and A2 (Interviewing, at step 3).
+%% Message numbers and wording match the rows of the scenario table in section 5.2.2(b).
+%% Render: mmdc -i fig5_2_2_uc02_sequence.mmd -o fig5_2_2_uc02_sequence.png -s 3 -b white
+%%{init: {"theme": "neutral", "sequence": {"mirrorActors": false, "wrap": true, "width": 175, "messageFontSize": 14, "noteFontSize": 13, "actorFontSize": 14, "boxMargin": 8}}}%%
+sequenceDiagram
+  actor S as Student
+  participant SU as :StatusUpdater
+  participant SA as :StudentAccount
+  participant IA as :InternshipApplication
+  participant SC as :StatusChange
+  participant IV as :Interview
+
+  Note over S,SA: Step (0) is the same interaction as UC-01 messages 0.1 and 0.2
+  S->>SU: 1 selects an application from the list
+  SU->>SA: 2.1 asks for the chosen application from the student's own records
+  SU->>IA: 2.2 asks for its current status and status history
+  SU->>S: 2.3 shows the application, its current status and its history in date order
+  S->>SU: 3 chooses a new status and saves
+  opt Interviewing chosen (A2)
+    SU->>S: A2.1 asks for the interview dates
+    S->>SU: A2.2 enters the interview dates
+  end
+  SU->>SU: 4 checks the new status differs from the current status
+  alt same as the current status (A1)
+    SU->>S: A1.1 says nothing has changed, no history entry is added
+  else a different status
+    SU->>IA: 5.1 asks it to change to the new status
+    IA->>SC: 5.2 records the previous status, new status and change date
+    IA->>IA: 5.3 sets its current status to the new status
+    opt interview dates were entered (A2)
+      IA->>IV: A2.3 creates an interview entry for each entered date
+    end
+    Note over IA,IV: 5.2 and 5.3 happen together or not at all
+    SU->>S: 6 shows the new status and the updated history
+  end
